@@ -441,3 +441,15 @@ body {
     margin-top: 0px;
   }
 }
+
+.donut{
+  display: flex;
+  justify-content: flex-end;
+  margin: 0px 100px 20px auto;
+  overflow: hidden;
+}
+
+/*
+1.調整功能->空白時不能新增
+2.圖表切換、顯示單一地區時的隱藏
+*/

@@ -4,7 +4,7 @@ axios.get("https://raw.githubusercontent.com/hexschool/js-training/main/travelAp
      .then(function(response){
       data = response.data.data;
       renderData(data);
-      areaRatio();
+      areaRatio(data);
      })
      .catch(function(error){
       console.log(error);
@@ -100,26 +100,39 @@ function addData(){
 
 addTicket_btn.addEventListener("click", function(){
     addData();
+    areaRatio(data);
     renderData(data);
     addTicket_form.reset();
     regionSearch.value = "";
     searchResult_text.innerHTML = `<p>本次搜尋共 ${data.length} 筆資料</p>`
 })
 
+
 let donutData = {};
 let arrDonutData = [];
-function areaRatio(){
+let donutArea;
+let donutColor = {};
+
+function areaRatio(data){
     data.forEach(function(item){
-        //let donutData = item.area;
          if( donutData[item.area] === undefined){
             donutData[item.area] = 1;
          }  else {
             donutData[item.area] += 1;
-         }
-
+         };
     });
     arrDonutData = Object.entries(donutData)
-    console.log(arrDonutData)
+    donutArea = Object.keys(donutData)
+
+    donutArea.forEach(function(item){
+        if(item === "高雄"){
+            donutColor[item] = "#E68619";
+        } else if (item === "台北"){
+            donutColor[item] = "#26BFC7";
+        } else if (item === "台中"){
+            donutColor[item] = "#5151D3";
+        }
+    })
     chartGo()
 
 };
@@ -128,15 +141,21 @@ function chartGo(){
     const chart = c3.generate({
         bindto: '#chart',
         data: {
-          columns: arrDonutData,
           type : "donut",
-          colors:{
-            pattern:["#26BFC7","#5151D3","#E68619"]
-          }
+          columns: arrDonutData,
+          colors: donutColor,
+         },
+        size: {
+            width: 300,
         },
         donut:{
             title:"套票地區比重",
+            width: 25,
+            label:{
+                show: false,
+            },
         },
+        
     });
 
 }
