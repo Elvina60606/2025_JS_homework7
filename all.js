@@ -4,6 +4,7 @@ axios.get("https://raw.githubusercontent.com/hexschool/js-training/main/travelAp
      .then(function(response){
       data = response.data.data;
       renderData(data);
+      areaRatio();
      })
      .catch(function(error){
       console.log(error);
@@ -105,5 +106,38 @@ addTicket_btn.addEventListener("click", function(){
     searchResult_text.innerHTML = `<p>本次搜尋共 ${data.length} 筆資料</p>`
 })
 
+let donutData = {};
+let arrDonutData = [];
+function areaRatio(){
+    data.forEach(function(item){
+        //let donutData = item.area;
+         if( donutData[item.area] === undefined){
+            donutData[item.area] = 1;
+         }  else {
+            donutData[item.area] += 1;
+         }
 
+    });
+    arrDonutData = Object.entries(donutData)
+    console.log(arrDonutData)
+    chartGo()
+
+};
+
+function chartGo(){
+    const chart = c3.generate({
+        bindto: '#chart',
+        data: {
+          columns: arrDonutData,
+          type : "donut",
+          colors:{
+            pattern:["#26BFC7","#5151D3","#E68619"]
+          }
+        },
+        donut:{
+            title:"套票地區比重",
+        },
+    });
+
+}
 
