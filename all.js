@@ -1,10 +1,10 @@
-let data = [];
+const url = "https://raw.githubusercontent.com/hexschool/js-training/main/travelApi.json";
 
-axios.get("https://raw.githubusercontent.com/hexschool/js-training/main/travelApi.json")
-     .then(function(response){
+let data = [];
+axios.get(url).then(function(response){
       data = response.data.data;
       renderData(data);
-      areaRatio(data);
+      areaObj(data);
      })
      .catch(function(error){
       console.log(error);
@@ -50,7 +50,6 @@ function renderData(data){
     });
     ticketCard_area.innerHTML = str ; 
 }
-
 function filter(){
     let filterResult = [];
     data.forEach(function(item){
@@ -67,7 +66,7 @@ function filter(){
         cantFind_area.style.display = "block";
     }
     renderData(filterResult);
-    searchResult_text.innerHTML = `<p>本次搜尋共 ${filterResult.length} 筆資料</p>`;
+    searchResult_text.textContent = `本次搜尋共 ${filterResult.length} 筆資料`;
 }
 regionSearch.addEventListener("change", function(){
     filter();
@@ -85,6 +84,18 @@ const addTicket_form = document.querySelector(".addTicket-form")
 
 let obj = {};
 function addData(){
+  if(data.length == "" || 
+     ticketName.value.trim() == "" || 
+     ticketImgUrl.value.trim() == "" || 
+     ticketRegion.value.trim() == "" || 
+     ticketDescription.value.trim() == "" || 
+     Number(ticketNum.value.trim()) =="" || 
+     Number(ticketPrice.value.trim()) == "" ||
+     Number(ticketRate.value.trim()) == ""){
+      alert("欄位不得為空白，請重新輸入")
+      return;
+     }
+
     obj = {
       "id": data.length,
       "name": ticketName.value.trim(),
@@ -93,70 +104,55 @@ function addData(){
       "description": ticketDescription.value.trim(),
       "group": Number(ticketNum.value.trim()),
       "price": Number(ticketPrice.value.trim()),
-      "rate": Number(ticketRate.value.trim())
+      "rate": Number(ticketRate.value.trim()),
     };
     data.push(obj);
 }
 
 addTicket_btn.addEventListener("click", function(){
+    totalAreaObj = {};
     addData();
-    areaRatio(data);
     renderData(data);
+    areaObj(data);
     addTicket_form.reset();
     regionSearch.value = "";
-    searchResult_text.innerHTML = `<p>本次搜尋共 ${data.length} 筆資料</p>`
+    searchResult_text.textContent = `本次搜尋共 ${data.length} 筆資料`;
 })
 
+//////////////////////////////
 
-let donutData = {};
-let arrDonutData = [];
-let donutArea;
-let donutColor = {};
+let totalAreaObj = {};
+let donutData;
 
-function areaRatio(data){
-    data.forEach(function(item){
-         if( donutData[item.area] === undefined){
-            donutData[item.area] = 1;
-         }  else {
-            donutData[item.area] += 1;
-         };
-    });
-    arrDonutData = Object.entries(donutData)
-    donutArea = Object.keys(donutData)
+function areaObj(data){
+  data.forEach(function(item){
+    if(totalAreaObj[item.area] === undefined){
+      totalAreaObj[item.area] = 1;
+    } else {
+      totalAreaObj[item.area] += 1;
+    }    
+  })
+  donutData = Object.entries(totalAreaObj);
+  chart();
+}
 
-    donutArea.forEach(function(item){
-        if(item === "高雄"){
-            donutColor[item] = "#E68619";
-        } else if (item === "台北"){
-            donutColor[item] = "#26BFC7";
-        } else if (item === "台中"){
-            donutColor[item] = "#5151D3";
+function chart(){
+  const chart = c3.generate({
+    data: {
+        columns: donutData,
+        type : 'donut',
+    },
+    size: {
+          width: 200,
+          height: 200,
+    },
+    donut: {
+        title: "套票地區比重",
+        width: 20,
+        label: {
+          show: false,
         }
-    })
-    chartGo()
-
-};
-
-function chartGo(){
-    const chart = c3.generate({
-        bindto: '#chart',
-        data: {
-          type : "donut",
-          columns: arrDonutData,
-          colors: donutColor,
-         },
-        size: {
-            width: 300,
-        },
-        donut:{
-            title:"套票地區比重",
-            width: 25,
-            label:{
-                show: false,
-            },
-        },
-        
-    });
-
+    }
+});
 }
 

@@ -231,9 +231,10 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: space-between;
+  -webkit-box-align: flex-start;
+      -ms-flex-align: flex-start;
+          align-items: flex-start;
   max-width: 920px;
   margin: 0 auto;
   padding: 50px 0;
@@ -444,12 +445,10 @@ body {
 
 .donut{
   display: flex;
-  justify-content: flex-end;
-  margin: 0px 100px 20px auto;
+  margin-left: auto;
   overflow: hidden;
 }
 
 /*
-1.調整功能->空白時不能新增
 2.圖表切換、顯示單一地區時的隱藏
 */
