@@ -5,6 +5,8 @@ axios.get(url).then(function(response){
       data = response.data.data;
       renderData(data);
       areaObj(data);
+      let areaColor = donutColors(data)
+      chart(areaColor)
      })
      .catch(function(error){
       console.log(error);
@@ -16,6 +18,7 @@ const regionSearch = document.querySelector(".regionSearch")
 const searchResult_text = document.querySelector("#searchResult-text")
 const cantFind_area = document.querySelector(".cantFind-area")
 
+//渲染卡片
 function renderData(data){
     let str = "";
     data.forEach(function(item){
@@ -50,6 +53,7 @@ function renderData(data){
     });
     ticketCard_area.innerHTML = str ; 
 }
+//篩選地區
 function filter(){
     let filterResult = [];
     data.forEach(function(item){
@@ -68,6 +72,7 @@ function filter(){
     renderData(filterResult);
     searchResult_text.textContent = `本次搜尋共 ${filterResult.length} 筆資料`;
 }
+//觸發篩選地區
 regionSearch.addEventListener("change", function(){
     filter();
 })
@@ -82,20 +87,25 @@ const ticketDescription = document.querySelector("#ticketDescription")
 const addTicket_btn = document.querySelector(".addTicket-btn")
 const addTicket_form = document.querySelector(".addTicket-form")
 
+//驗證新增欄位
+function validation(){
+  if(ticketName.value.trim() === "" || 
+     ticketImgUrl.value.trim() === "" || 
+     ticketRegion.value.trim() === "" || 
+     ticketDescription.value.trim() === "" || 
+     Number(ticketNum.value.trim()) ==="" || 
+     Number(ticketPrice.value.trim()) === "" ||
+     Number(ticketRate.value.trim()) === ""){
+      alert("欄位不得為空白，請重新輸入")
+      return false;
+     } else {
+      return true;
+     }
+    }
+
+//新增欄位
 let obj = {};
 function addData(){
-  if(data.length == "" || 
-     ticketName.value.trim() == "" || 
-     ticketImgUrl.value.trim() == "" || 
-     ticketRegion.value.trim() == "" || 
-     ticketDescription.value.trim() == "" || 
-     Number(ticketNum.value.trim()) =="" || 
-     Number(ticketPrice.value.trim()) == "" ||
-     Number(ticketRate.value.trim()) == ""){
-      alert("欄位不得為空白，請重新輸入")
-      return;
-     }
-
     obj = {
       "id": data.length,
       "name": ticketName.value.trim(),
@@ -109,21 +119,24 @@ function addData(){
     data.push(obj);
 }
 
+//觸發新增欄位
 addTicket_btn.addEventListener("click", function(){
-    totalAreaObj = {};
-    addData();
-    renderData(data);
-    areaObj(data);
-    addTicket_form.reset();
-    regionSearch.value = "";
-    searchResult_text.textContent = `本次搜尋共 ${data.length} 筆資料`;
+   if (!validation()){
+      return;
+   } else {
+     addData();
+     totalAreaObj = {};
+     renderData(data);
+     areaObj(data);
+     addTicket_form.reset();
+     regionSearch.value = "";
+     searchResult_text.textContent = `本次搜尋共 ${data.length} 筆資料`;
+   }
 })
 
-//////////////////////////////
-
+//建立chart內資料
 let totalAreaObj = {};
 let donutData;
-
 function areaObj(data){
   data.forEach(function(item){
     if(totalAreaObj[item.area] === undefined){
@@ -133,14 +146,30 @@ function areaObj(data){
     }    
   })
   donutData = Object.entries(totalAreaObj);
-  chart();
 }
 
-function chart(){
+//建立chart內顏色對應資料
+function donutColors(data){
+    let areaColor = {}
+    data.forEach(function(item){
+      if(item.area === "台北"){
+        areaColor[item.area]= "#26C0C7";
+      } else if(item.area === "台中"){
+        areaColor[item.area] = "#5151D3";
+      } else if(item.area === "高雄"){
+        areaColor[item.area] = "#E68618";
+      }
+    })
+    return areaColor
+  }
+
+//C3.js
+function chart(areaColor){
   const chart = c3.generate({
     data: {
         columns: donutData,
         type : 'donut',
+        colors: areaColor,
     },
     size: {
           width: 200,
